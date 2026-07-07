@@ -11,30 +11,35 @@ body {
 }
 
 .app {
-  width: min(1120px, 92vw);
+  width: min(1120px, 94vw);
+  height: 100vh;
   margin: 0 auto;
-  padding: 36px 0 48px;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .game-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .game-header h1 {
   margin: 0;
-  font-size: clamp(36px, 6vw, 68px);
-  letter-spacing: -3px;
+  font-size: clamp(28px, 5vw, 52px);
+  letter-spacing: -2px;
   font-weight: 700;
 }
 
 .game-header p {
-  margin: 8px 0 0;
+  margin: 4px 0 0;
   color: #777;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 button {
@@ -57,50 +62,55 @@ button:hover {
 
 .stats {
   display: flex;
-  gap: 12px;
-  margin-bottom: 26px;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .stats div {
   border: 1px solid #e8e8e8;
-  padding: 14px 18px;
-  min-width: 130px;
+  padding: 10px 14px;
+  min-width: 110px;
   background: #fff;
-  border-radius: 18px;
+  border-radius: 14px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
 }
 
 .label {
   display: block;
   color: #999;
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 #moves,
 #matches {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .game-board {
+  flex: 1;
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 14px;
+  gap: clamp(6px, 1vw, 12px);
+  min-height: 0;
+  align-content: center;
+  justify-content: center;
 }
 
 .card {
   position: relative;
-  aspect-ratio: 1 / 1.2;
+  width: var(--card-size);
+  height: var(--card-height);
   border: 1px solid #eee;
   background: #fff;
   cursor: pointer;
   perspective: 1000px;
-  border-radius: 20px;
+  border-radius: clamp(10px, 1.4vw, 20px);
   overflow: hidden;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
 }
 
 .card-inner {
@@ -192,11 +202,6 @@ button:hover {
   color: #111;
 }
 
-@media (max-width: 900px) {
-  .game-board {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-}
 
 @media (max-width: 500px) {
   .app {
@@ -226,25 +231,15 @@ button:hover {
   }
 
 .controls {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .controls select {
-    width: 100%;
-  }
-}
-
-.controls {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .controls label {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: #777;
@@ -255,9 +250,9 @@ button:hover {
   border: 1px solid #e5e5e5;
   background: #fff;
   color: #111;
-  padding: 12px 42px 12px 16px;
+  padding: 9px 38px 9px 14px;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
   background-image:
@@ -270,9 +265,4 @@ button:hover {
     5px 5px,
     5px 5px;
   background-repeat: no-repeat;
-}
-
-.controls select:focus {
-  outline: none;
-  border-color: #111;
 }

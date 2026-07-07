@@ -1,15 +1,21 @@
 const DIFFICULTY_SETTINGS = {
   easy: {
     pairs: 6,
-    columns: 4
+    desktop: { columns: 4, rows: 3 },
+    tablet: { columns: 4, rows: 3 },
+    mobile: { columns: 3, rows: 4 }
   },
   medium: {
     pairs: 10,
-    columns: 5
+    desktop: { columns: 5, rows: 4 },
+    tablet: { columns: 5, rows: 4 },
+    mobile: { columns: 4, rows: 5 }
   },
   hard: {
     pairs: 16,
-    columns: 8
+    desktop: { columns: 8, rows: 4 },
+    tablet: { columns: 4, rows: 8 },
+    mobile: { columns: 4, rows: 8 }
   }
 };
 
@@ -47,7 +53,7 @@ function startGame() {
 
   gameBoard.innerHTML = "";
 
-  gameBoard.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
+  updateBoardSizing(settings);
 
   if (!window.IMAGE_FILES || window.IMAGE_FILES.length < totalPairs) {
     gameBoard.innerHTML = `
@@ -169,8 +175,60 @@ function resetTurn() {
   lockBoard = false;
 }
 
+function getLayout(settings) {
+  const width = window.innerWidth;
+
+  if (width <= 600) {
+    return settings.mobile;
+  }
+
+  if (width <= 900) {
+    return settings.tablet;
+  }
+
+  return settings.desktop;
+}
+
+function updateBoardSizing(settings) {
+  const layout = getLayout(settings);
+
+  const boardRect = gameBoard.getBoundingClientRect();
+
+  const gap = parseFloat(getComputedStyle(gameBoard).gap) || 12;
+
+  const availableWidth = boardRect.width;
+  const availableHeight = boardRect.height;
+
+  const totalGapWidth = gap * (layout.columns - 1);
+  const totalGapHeight = gap * (layout.rows - 1);
+
+  const maxCardWidth = (availableWidth - totalGapWidth) / layout.columns;
+  const maxCardHeight = (availableHeight - totalGapHeight) / layout.rows;
+
+  const cardRatio = 1.2;
+
+  let cardWidth = maxCardWidth;
+  let cardHeight = cardWidth * cardRatio;
+
+  if (cardHeight > maxCardHeight) {
+    cardHeight = maxCardHeight;
+    cardWidth = cardHeight / cardRatio;
+  }
+
+  gameBoard.style.setProperty("--card-size", `${cardWidth}px`);
+  gameBoard.style.setProperty("--card-height", `${cardHeight}px`);
+  gameBoard.style.gridTemplateColumns = `repeat(${layout.columns}, var(--card-size))`;
+}
+
 restartBtn.addEventListener("click", startGame);
 playAgainBtn.addEventListener("click", startGame);
+
+window.addEventListener("resize", () => {
+  const difficulty = difficultySelect.value;
+  const settings = DIFFICULTY_SETTINGS[difficulty];
+
+  updateBoardSizing(settings);
+});
 
 difficultySelect.addEventListener("change", startGame);
 
