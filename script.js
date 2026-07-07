@@ -1,22 +1,22 @@
 const DIFFICULTY_SETTINGS = {
-  easy: {
-    pairs: 6,
-    desktop: { columns: 4, rows: 3 },
-    tablet: { columns: 4, rows: 3 },
-    mobile: { columns: 3, rows: 4 }
-  },
-  medium: {
-    pairs: 10,
-    desktop: { columns: 5, rows: 4 },
-    tablet: { columns: 5, rows: 4 },
-    mobile: { columns: 4, rows: 5 }
-  },
-  hard: {
-    pairs: 16,
-    desktop: { columns: 8, rows: 4 },
-    tablet: { columns: 4, rows: 8 },
-    mobile: { columns: 4, rows: 8 }
-  }
+    easy: {
+        pairs: 6,
+        desktop: { columns: 4, rows: 3 },
+        tablet: { columns: 4, rows: 3 },
+        mobile: { columns: 3, rows: 4 }
+    },
+    medium: {
+        pairs: 10,
+        desktop: { columns: 5, rows: 4 },
+        tablet: { columns: 5, rows: 4 },
+        mobile: { columns: 4, rows: 5 }
+    },
+    hard: {
+        pairs: 16,
+        desktop: { columns: 8, rows: 4 },
+        tablet: { columns: 4, rows: 8 },
+        mobile: { columns: 4, rows: 8 }
+    }
 };
 
 const gameBoard = document.getElementById("gameBoard");
@@ -26,6 +26,8 @@ const restartBtn = document.getElementById("restartBtn");
 const playAgainBtn = document.getElementById("playAgainBtn");
 const winMessage = document.getElementById("winMessage");
 const difficultySelect = document.getElementById("difficultySelect");
+const timerEl = document.getElementById("timer");
+const finalStatsEl = document.getElementById("finalStats");
 
 let firstCard = null;
 let secondCard = null;
@@ -35,69 +37,103 @@ let moves = 0;
 let matches = 0;
 let totalPairs = DIFFICULTY_SETTINGS.hard.pairs;
 
+let timerInterval = null;
+let secondsElapsed = 0;
+
+function startTimer() {
+    stopTimer();
+
+    secondsElapsed = 0;
+    timerEl.textContent = formatTime(secondsElapsed);
+
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        timerEl.textContent = formatTime(secondsElapsed);
+    }, 1000);
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const paddedMinutes = String(minutes).padStart(2, "0");
+    const paddedSeconds = String(seconds).padStart(2, "0");
+
+    return `${paddedMinutes}:${paddedSeconds}`;
+}
+
 function startGame() {
-  const difficulty = difficultySelect.value;
-  const settings = DIFFICULTY_SETTINGS[difficulty];
+    const difficulty = difficultySelect.value;
+    const settings = DIFFICULTY_SETTINGS[difficulty];
 
-  totalPairs = settings.pairs;
+    totalPairs = settings.pairs;
 
-  firstCard = null;
-  secondCard = null;
-  lockBoard = false;
-  moves = 0;
-  matches = 0;
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+    moves = 0;
+    matches = 0;
 
-  movesEl.textContent = moves;
-  matchesEl.textContent = `${matches} / ${totalPairs}`;
-  winMessage.classList.add("hidden");
+    startTimer();
 
-  gameBoard.innerHTML = "";
+    movesEl.textContent = moves;
+    matchesEl.textContent = `${matches} / ${totalPairs}`;
+    winMessage.classList.add("hidden");
 
-  updateBoardSizing(settings);
+    gameBoard.innerHTML = "";
 
-  if (!window.IMAGE_FILES || window.IMAGE_FILES.length < totalPairs) {
-    gameBoard.innerHTML = `
+    updateBoardSizing(settings);
+
+    if (!window.IMAGE_FILES || window.IMAGE_FILES.length < totalPairs) {
+        gameBoard.innerHTML = `
       <p class="error">
         You need at least ${totalPairs} playable images for ${difficulty} mode.
       </p>
     `;
-    return;
-  }
+        return;
+    }
 
-  const selectedImages = pickRandomImages(window.IMAGE_FILES, totalPairs);
+    const selectedImages = pickRandomImages(window.IMAGE_FILES, totalPairs);
 
-  const cards = [...selectedImages, ...selectedImages].map((image, index) => {
-    return {
-      id: index,
-      image: image,
-      matchId: image
-    };
-  });
+    const cards = [...selectedImages, ...selectedImages].map((image, index) => {
+        return {
+            id: index,
+            image: image,
+            matchId: image
+        };
+    });
 
-  const shuffledCards = shuffleArray(cards);
+    const shuffledCards = shuffleArray(cards);
 
-  shuffledCards.forEach(cardData => {
-    const card = createCard(cardData);
-    gameBoard.appendChild(card);
-  });
+    shuffledCards.forEach(cardData => {
+        const card = createCard(cardData);
+        gameBoard.appendChild(card);
+    });
 }
 
 function pickRandomImages(images, count) {
-  const shuffledImages = shuffleArray([...images]);
-  return shuffledImages.slice(0, count);
+    const shuffledImages = shuffleArray([...images]);
+    return shuffledImages.slice(0, count);
 }
 
 function shuffleArray(array) {
-  return array.sort(() => Math.random() - 0.5);
+    return array.sort(() => Math.random() - 0.5);
 }
 
 function createCard(cardData) {
-  const card = document.createElement("div");
-  card.classList.add("card");
+    const card = document.createElement("div");
+    card.classList.add("card");
 
-  card.dataset.matchId = cardData.matchId;
+    card.dataset.matchId = cardData.matchId;
 
-  card.innerHTML = `
+    card.innerHTML = `
     <div class="card-inner">
       <div class="card-front">
         <img src="images/card-cover.jpg" alt="Card cover" />
@@ -108,126 +144,133 @@ function createCard(cardData) {
     </div>
   `;
 
-  card.addEventListener("click", () => handleCardClick(card));
+    card.addEventListener("click", () => handleCardClick(card));
 
-  return card;
+    return card;
 }
 
 function handleCardClick(card) {
-  if (lockBoard) return;
-  if (card.classList.contains("flipped")) return;
-  if (card.classList.contains("matched")) return;
+    if (lockBoard) return;
+    if (card.classList.contains("flipped")) return;
+    if (card.classList.contains("matched")) return;
 
-  card.classList.add("flipped");
+    card.classList.add("flipped");
 
-  if (!firstCard) {
-    firstCard = card;
-    return;
-  }
+    if (!firstCard) {
+        firstCard = card;
+        return;
+    }
 
-  secondCard = card;
-  moves++;
-  movesEl.textContent = moves;
+    secondCard = card;
+    moves++;
+    movesEl.textContent = moves;
 
-  checkForMatch();
+    checkForMatch();
 }
 
 function checkForMatch() {
-  const isMatch = firstCard.dataset.matchId === secondCard.dataset.matchId;
+    const isMatch = firstCard.dataset.matchId === secondCard.dataset.matchId;
 
-  if (isMatch) {
-    handleMatch();
-  } else {
-    handleMismatch();
-  }
+    if (isMatch) {
+        handleMatch();
+    } else {
+        handleMismatch();
+    }
 }
 
 function handleMatch() {
-  firstCard.classList.add("matched");
-  secondCard.classList.add("matched");
+    firstCard.classList.add("matched");
+    secondCard.classList.add("matched");
 
-  matches++;
-  matchesEl.textContent = `${matches} / ${totalPairs}`;
+    matches++;
+    matchesEl.textContent = `${matches} / ${totalPairs}`;
 
-  resetTurn();
+    resetTurn();
 
-  if (matches === totalPairs) {
-    setTimeout(() => {
-      winMessage.classList.remove("hidden");
-    }, 500);
-  }
+    if (matches === totalPairs) {
+        stopTimer();
+
+        const finalTime = formatTime(secondsElapsed);
+
+        finalStatsEl.textContent = `You completed the game in ${finalTime} with ${moves} moves.`;
+
+        setTimeout(() => {
+            winMessage.classList.remove("hidden");
+        }, 500);
+    }
+
 }
 
 function handleMismatch() {
-  lockBoard = true;
+    lockBoard = true;
 
-  setTimeout(() => {
-    firstCard.classList.remove("flipped");
-    secondCard.classList.remove("flipped");
+    setTimeout(() => {
+        firstCard.classList.remove("flipped");
+        secondCard.classList.remove("flipped");
 
-    resetTurn();
-  }, 900);
+        resetTurn();
+    }, 900);
 }
 
 function resetTurn() {
-  firstCard = null;
-  secondCard = null;
-  lockBoard = false;
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
 }
 
 function getLayout(settings) {
-  const width = window.innerWidth;
+    const width = window.innerWidth;
 
-  if (width <= 600) {
-    return settings.mobile;
-  }
+    if (width <= 600) {
+        return settings.mobile;
+    }
 
-  if (width <= 900) {
-    return settings.tablet;
-  }
+    if (width <= 900) {
+        return settings.tablet;
+    }
 
-  return settings.desktop;
+    return settings.desktop;
 }
 
 function updateBoardSizing(settings) {
-  const layout = getLayout(settings);
+    const layout = getLayout(settings);
 
-  const boardRect = gameBoard.getBoundingClientRect();
+    const boardRect = gameBoard.getBoundingClientRect();
 
-  const gap = parseFloat(getComputedStyle(gameBoard).gap) || 12;
+    const gap = parseFloat(getComputedStyle(gameBoard).gap) || 12;
 
-  const availableWidth = boardRect.width;
-  const availableHeight = boardRect.height;
+    const availableWidth = boardRect.width;
+    const availableHeight = boardRect.height;
 
-  const totalGapWidth = gap * (layout.columns - 1);
-  const totalGapHeight = gap * (layout.rows - 1);
+    const totalGapWidth = gap * (layout.columns - 1);
+    const totalGapHeight = gap * (layout.rows - 1);
 
-  const maxCardWidth = (availableWidth - totalGapWidth) / layout.columns;
-  const maxCardHeight = (availableHeight - totalGapHeight) / layout.rows;
+    const maxCardWidth = (availableWidth - totalGapWidth) / layout.columns;
+    const maxCardHeight = (availableHeight - totalGapHeight) / layout.rows;
 
-  const cardRatio = 1.2;
+    const cardRatio = 1.2;
 
-  let cardWidth = maxCardWidth;
-  let cardHeight = cardWidth * cardRatio;
+    let cardWidth = maxCardWidth;
+    let cardHeight = cardWidth * cardRatio;
 
-  if (cardHeight > maxCardHeight) {
-    cardHeight = maxCardHeight;
-    cardWidth = cardHeight / cardRatio;
-  }
+    if (cardHeight > maxCardHeight) {
+        cardHeight = maxCardHeight;
+        cardWidth = cardHeight / cardRatio;
+    }
 
-  gameBoard.style.setProperty("--card-size", `${cardWidth}px`);
-  gameBoard.style.setProperty("--card-height", `${cardHeight}px`);
-  gameBoard.style.gridTemplateColumns = `repeat(${layout.columns}, var(--card-size))`;
+    gameBoard.style.setProperty("--card-size", `${cardWidth}px`);
+    gameBoard.style.setProperty("--card-height", `${cardHeight}px`);
+    gameBoard.style.gridTemplateColumns = `repeat(${layout.columns}, var(--card-size))`;
 }
 
 restartBtn.addEventListener("click", startGame);
 playAgainBtn.addEventListener("click", startGame);
 
 window.addEventListener("resize", () => {
-  const difficulty = difficultySelect.value;
-  const settings = DIFFICULTY_SETTINGS[difficulty];
+    const difficulty = difficultySelect.value;
+    const settings = DIFFICULTY_SETTINGS[difficulty];
 
-  updateBoardSizing(settings);
+    updateBoardSizing(settings);
 });
 
 difficultySelect.addEventListener("change", startGame);

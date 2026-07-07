@@ -20,60 +20,124 @@ body {
   overflow: hidden;
 }
 
+/* Header */
+
 .game-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
   flex-shrink: 0;
 }
 
 .game-header h1 {
   margin: 0;
-  font-size: clamp(28px, 5vw, 52px);
-  letter-spacing: -2px;
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -2.5px;
   font-weight: 700;
+  color: #111;
 }
 
 .game-header p {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   color: #777;
   font-size: 14px;
+  line-height: 1.4;
 }
+
+.game-header button {
+  flex-shrink: 0;
+}
+
+/* Buttons */
 
 button {
   border: 1px solid #111;
   background: #111;
   color: #fff;
-  padding: 12px 18px;
+  padding: 10px 16px;
   border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.2px;
-  transition: 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 button:hover {
   background: #fff;
   color: #111;
+  transform: translateY(-1px);
 }
 
-.stats {
+button:active {
+  transform: translateY(0);
+}
+
+/* Difficulty selector */
+
+.controls {
   display: flex;
+  align-items: center;
   gap: 10px;
   margin-bottom: 12px;
   flex-shrink: 0;
 }
 
-.stats div {
-  border: 1px solid #e8e8e8;
-  padding: 10px 14px;
-  min-width: 110px;
+.controls label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #888;
+  font-weight: 600;
+}
+
+.controls select {
+  appearance: none;
+  border: 1px solid #e5e5e5;
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
+  color: #111;
+  padding: 10px 40px 10px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.035);
+  background-image:
+    linear-gradient(45deg, transparent 50%, #111 50%),
+    linear-gradient(135deg, #111 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 15px) 50%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+}
+
+.controls select:focus {
+  outline: none;
+  border-color: #111;
+}
+
+/* Stats */
+
+.stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.stats div {
+  border: 1px solid #eeeeee;
+  padding: 10px 14px;
+  min-width: 108px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.035);
 }
 
 .label {
@@ -81,15 +145,21 @@ button:hover {
   color: #999;
   font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.7px;
+  font-weight: 600;
   margin-bottom: 4px;
 }
 
 #moves,
-#matches {
+#matches,
+#timer {
   font-size: 20px;
+  line-height: 1;
   font-weight: 700;
+  color: #111;
 }
+
+/* Game board */
 
 .game-board {
   flex: 1;
@@ -99,6 +169,8 @@ button:hover {
   align-content: center;
   justify-content: center;
 }
+
+/* Cards */
 
 .card {
   position: relative;
@@ -135,13 +207,17 @@ button:hover {
   justify-content: center;
 }
 
-.card-front img {
+.card-front {
+  background: #fff;
+  overflow: hidden;
+}
+
+.card-front img,
+.card-back img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
-
 
 .card-back {
   background: #fff;
@@ -150,9 +226,6 @@ button:hover {
 }
 
 .card-back img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   filter: none;
 }
 
@@ -164,6 +237,8 @@ button:hover {
 .card.matched img {
   opacity: 0.92;
 }
+
+/* Win message */
 
 .win-message {
   position: fixed;
@@ -202,67 +277,100 @@ button:hover {
   color: #111;
 }
 
+/* Mobile */
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .app {
-    padding-top: 24px;
+    width: min(100% - 24px, 1120px);
+    padding: 16px 0;
   }
 
   .game-header {
-    flex-direction: column;
     align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .game-header h1 {
+    font-size: 34px;
+    letter-spacing: -1.8px;
+  }
+
+  .game-header p {
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  .game-header button {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .controls select {
+    min-width: 170px;
   }
 
   .stats {
     width: 100%;
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
   .stats div {
     flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
   }
 
-.game-board {
-  display: grid;
-  gap: 14px;
-}
+  #moves,
+  #matches,
+  #timer {
+    font-size: 18px;
+  }
 
   .card {
-    border-radius: 16px;
+    border-radius: 14px;
   }
 
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-  flex-shrink: 0;
+  .win-message h2 {
+    font-size: 44px;
+  }
 }
 
-.controls label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: #777;
-}
+@media (max-width: 420px) {
+  .game-header {
+    gap: 10px;
+  }
 
-.controls select {
-  appearance: none;
-  border: 1px solid #e5e5e5;
-  background: #fff;
-  color: #111;
-  padding: 9px 38px 9px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
-  background-image:
-    linear-gradient(45deg, transparent 50%, #111 50%),
-    linear-gradient(135deg, #111 50%, transparent 50%);
-  background-position:
-    calc(100% - 20px) 50%,
-    calc(100% - 15px) 50%;
-  background-size:
-    5px 5px,
-    5px 5px;
-  background-repeat: no-repeat;
+  .game-header h1 {
+    font-size: 30px;
+  }
+
+  .controls {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .controls select {
+    width: 100%;
+  }
+
+  .stats div {
+    padding: 9px 10px;
+  }
+
+  .label {
+    font-size: 9px;
+  }
+
+  #moves,
+  #matches,
+  #timer {
+    font-size: 16px;
+  }
 }
