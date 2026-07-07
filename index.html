@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Memory Card Game</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <main class="app">
+   <header class="game-header">
+  <div>
+    <h1>Memory</h1>
+    <p>Match the image pairs</p>
+  </div>
+
+  <button id="restartBtn">New Game</button>
+</header>
+
+<section class="controls">
+  <label for="difficultySelect">Difficulty</label>
+
+  <select id="difficultySelect">
+    <option value="easy">Easy — 12 cards</option>
+    <option value="medium">Medium — 20 cards</option>
+    <option value="hard" selected>Hard — 32 cards</option>
+  </select>
+</section>
+
+<section class="stats">
+  <div>
+    <span class="label">Moves</span>
+    <span id="moves">0</span>
+  </div>
+
+  <div>
+    <span class="label">Matches</span>
+    <span id="matches">0 / 16</span>
+  </div>
+</section>
+
+    <section id="gameBoard" class="game-board"></section>
+
+    <div id="winMessage" class="win-message hidden">
+      <h2>You won!</h2>
+      <p>You matched all cards.</p>
+      <button id="playAgainBtn">Play Again</button>
+    </div>
+  </main>
+
+  <!-- This file contains the list of image filenames -->
+  <script src="images.js"></script>
+
+  <!-- Main game logic -->
+  <script src="script.js"></script>
+</body>
+</html>
