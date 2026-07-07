@@ -28,6 +28,8 @@ const winMessage = document.getElementById("winMessage");
 const difficultySelect = document.getElementById("difficultySelect");
 const timerEl = document.getElementById("timer");
 const finalStatsEl = document.getElementById("finalStats");
+const flipSound = document.getElementById("flipSound");
+const winSound = document.getElementById("winSound");
 
 let firstCard = null;
 let secondCard = null;
@@ -150,11 +152,14 @@ function createCard(cardData) {
 }
 
 function handleCardClick(card) {
+    console.log("card flipped");
+
     if (lockBoard) return;
     if (card.classList.contains("flipped")) return;
     if (card.classList.contains("matched")) return;
 
     card.classList.add("flipped");
+    playFlipSound();
 
     if (!firstCard) {
         firstCard = card;
@@ -189,7 +194,8 @@ function handleMatch() {
 
     if (matches === totalPairs) {
         stopTimer();
-
+        playWinSound();
+        
         const finalTime = formatTime(secondsElapsed);
 
         finalStatsEl.textContent = `You completed the game in ${finalTime} with ${moves} moves.`;
@@ -216,6 +222,25 @@ function resetTurn() {
     firstCard = null;
     secondCard = null;
     lockBoard = false;
+}
+
+function playFlipSound() {
+    if (!flipSound) return;
+
+    flipSound.currentTime = 0;
+    flipSound.play().catch(() => {
+        // Some browsers block audio until the user interacts with the page.
+        // Since this runs on card click, it should usually work.
+    });
+}
+
+function playWinSound() {
+  if (!winSound) return;
+
+  winSound.currentTime = 0;
+  winSound.play().catch(() => {
+    // Browser may block audio in rare cases.
+  });
 }
 
 function getLayout(settings) {
